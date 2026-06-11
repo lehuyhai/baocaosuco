@@ -147,12 +147,13 @@
         }
         @media (min-width: 600px) {
             .btn-zone {
+                display: flex;
                 flex-direction: row;
                 justify-content: center;
                 gap: 15px;
             }
             .btn {
-                width: 200px;
+                width: 220px;
             }
         }
         .btn:active { transform: scale(0.98); }
@@ -200,13 +201,19 @@
             border: 1px solid #e2e8f0;
             padding: 12px;
         }
+        .sp-status {
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 8px;
+            color: #475569;
+        }
     </style>
 </head>
 <body>
 
 <div class="wrapper">
     <header>
-        <h1>🚨 CÔNG CỤ TẠO BÁO CÁO SỰ CỐ VIBER</h1>
+        <h1>🚨 CÔNG CỤ TẠO BÁO CÁO SỰ CỐ & ĐỒNG BỘ SHAREPOINT</h1>
         <p>Hệ thống tự động chuẩn hóa định dạng văn bản quy trình vận hành</p>
     </header>
 
@@ -234,8 +241,8 @@
 
     <div class="grid-2">
         <div class="grid-col form-row">
-            <label for="impact">4. Mức độ ảnh hưởng:</label>
-            <input type="text" id="impact" value=" mô tả">
+            <label for="impact">4. Mức độ ảnh hưởng / Phân vùng lỗi:</label>
+            <input type="text" id="impact" value="Mô tả phân vùng ảnh hưởng">
         </div>
         <div class="grid-col form-row">
             <label for="reason">5. Nguyên nhân:</label>
@@ -255,16 +262,17 @@
 
     <div class="form-row">
         <label for="staff">8. Người điều hành / Xử lý (Mỗi chức danh một dòng):</label>
-        <textarea id="staff" rows="4">- Quản lý sự cố (IM): Nguyễn Thái Bình&#10;- Nhân sự FO: Lê Kim Bính, &#10;- Nhân sự phòng NVKH: &#10;- Nhân sự đài VHKT MB: </textarea>
+        <textarea id="staff" rows="4">- Quản lý sự cố (IM): Nguyễn Thái Bình&#10;- Nhân sự FO: Lê Kim Bính&#10;- Nhân sự phòng NVKH: &#10;- Nhân sự đài VHKT MB: </textarea>
     </div>
 
     <div class="actions-bar">
-        <div class="actions-title">Chọn trạng thái để xuất văn bản</div>
+        <div class="actions-title">Chọn trạng thái để Đồng bộ SharePoint & Xuất văn bản Viber</div>
         <div class="btn-zone">
             <button class="btn btn-danger" onclick="process('START')">🔴 1. Bắt đầu</button>
             <button class="btn btn-warning" onclick="process('UPDATE')">🟡 2. Cập nhật</button>
             <button class="btn btn-success" onclick="process('END')">🟢 3. Kết thúc</button>
         </div>
+        <div id="sharepointStatus" class="sp-status" style="display: none;">⏳ Đang đồng bộ dữ liệu lên SharePoint...</div>
     </div>
 
     <div class="output-zone" id="outputArea" style="display:none;">
@@ -279,6 +287,9 @@
 </div>
 
 <script>
+    // ĐIỀN ĐƯỜNG DẪN WEBHOOK POWER AUTOMATE CỦA BẠN VÀO ĐÂY
+    const POWER_AUTOMATE_URL = "LÀM_THEO_HƯỚNG_DẪN_BÊN_DƯỚI_ĐỂ_LẤY_LINK_DÁN_VÀO_ĐÂY";
+
     function getSystemTime() {
         const d = new Date();
         const pad = (v) => v < 10 ? '0' + v : v;
@@ -334,42 +345,79 @@
         result += `Người điều hành/xử lý:\n${formatBulletLines(staff)}`;
 
         document.getElementById('finalResult').value = result;
-        
-        // Reset trạng thái chữ trên nút Copy nếu trước đó đã copy
         document.getElementById('copyBtn').innerText = "📋 Sao Chép Nhanh";
         
         const outArea = document.getElementById('outputArea');
         outArea.style.display = 'block';
         outArea.scrollIntoView({ behavior: 'smooth' });
+
+        // TỰ ĐỘNG KÍCH HOẠT ĐẨY DỮ LIỆU SANG SHAREPOINT (KẾ THỪA)
+        sendToSharePoint(status, name, start, end, impact, reason, steps, nextSteps, staff);
     }
 
-    // Cơ chế Copy Hybrid bảo mật cao, tương thích mọi trình duyệt và app nhúng
+    function sendToSharePoint(status, name, start, end, impact, reason, steps, nextSteps, staff) {
+        if (!POWER_AUTOMATE_URL || POWER_AUTOMATE_URL.includes("LÀM_THEO_HƯỚNG_DẪN")) {
+            console.log("Chưa cấu hình URL Power Automate.");
+            return;
+        }
+
+        const spStatus = document.getElementById('sharepointStatus');
+        spStatus.style.display = 'block';
+        spStatus.style.color = '#f59e0b';
+        spStatus.innerText = "⏳ Đang đồng bộ dữ liệu lên SharePoint...";
+
+        // Đóng gói payload JSON sạch sẽ có tính kế thừa cao
+        const payload = {
+            "Status": status,
+            "Event_Title": name,
+            "Start_Time": start,
+            "End_Time": end,
+            "Impact_Scope": impact,
+            "Reason": reason,
+            "Steps_Taken": steps,
+            "Next_Steps": nextSteps,
+            "Staff_In_Charge": staff
+        };
+
+        fetch(POWER_AUTOMATE_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        })
+        .then(response => {
+            if (response.ok) {
+                spStatus.style.color = '#10b981';
+                spStatus.innerText = "✅ Đồng bộ SharePoint thành công!";
+            } else {
+                throw new Error("Lỗi phản hồi từ API");
+            }
+        })
+        .catch(error => {
+            spStatus.style.color = '#ef4444';
+            spStatus.innerText = "❌ Đồng bộ lỗi! (Kiểm tra lại cấu hình Flow)";
+            console.error(error);
+        });
+    }
+
     function copyText() {
         const target = document.getElementById("finalResult");
         const btn = document.getElementById("copyBtn");
-        
-        // Bước 1: Bôi đen phần văn bản trước (Hỗ trợ cơ chế cũ & Mobile)
         target.focus();
         target.select();
         target.setSelectionRange(0, 99999);
 
-        // Bước 2: Thử nghiệm API Clipboard hiện đại trước
         if (navigator.clipboard && navigator.clipboard.writeText) {
             navigator.clipboard.writeText(target.value)
-                .then(() => {
-                    btn.innerText = "✅ Đã Copy!";
-                })
+                .then(() => { btn.innerText = "✅ Đã Copy!"; })
                 .catch(() => {
-                    // Bước 3: Fallback dùng lệnh truyền thống nếu API bị chặn quyền
                     try {
                         document.execCommand("copy");
                         btn.innerText = "✅ Đã Copy!";
                     } catch (err) {
-                        alert("Trình duyệt chặn tính năng tự động. Bạn hãy bấm giữ vào khung văn bản dưới đây để Copy thủ công!");
+                        alert("Trình duyệt chặn sao chép tự động. Hãy copy thủ công!");
                     }
                 });
         } else {
-            // Dành cho các trình duyệt/Webview bảo mật cao không bật API Clipboard
             try {
                 document.execCommand("copy");
                 btn.innerText = "✅ Đã Copy!";
