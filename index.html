@@ -268,7 +268,7 @@
 
 <div class="wrapper">
     <header>
-        <h1>🚨 CÔNG CỤ TẠO BÁO CÁO SỰ CỐ & ĐỒNG BỘ SHAREPOINT_15h37</h1>
+        <h1>🚨 CÔNG CỤ TẠO BÁO CÁO SỰ CỐ & ĐỒNG BỘ SHAREPOINT_16h07</h1>
         <p>Hệ thống tự động chuẩn hóa định dạng văn bản quy trình vận hành</p>
     </header>
 
@@ -303,14 +303,14 @@
         <div class="grid-col form-row">
             <label for="impact">4. Mức độ ảnh hưởng / Phân vùng lỗi:</label>
             <div class="input-mic-group">
-                <input type="text" id="impact" placeholder="Mô tả phân vùng ảnh hưởng">
+                <textarea id="impact" rows="3" placeholder="Mô tả phân vùng ảnh hưởng"></textarea>
                 <button type="button" class="btn-mic" onclick="toggleSpeech('impact', this)">🎙️</button>
             </div>
         </div>
         <div class="grid-col form-row">
             <label for="reason">5. Nguyên nhân:</label>
             <div class="input-mic-group">
-                <input type="text" id="reason" placeholder="Đang kiểm tra...">
+                <textarea id="reason" rows="3" placeholder="Đang kiểm tra..."></textarea>
                 <button type="button" class="btn-mic" onclick="toggleSpeech('reason', this)">🎙️</button>
             </div>
         </div>
@@ -361,6 +361,9 @@
 <script>
     const POWER_AUTOMATE_URL = "https://default89a7f078234b46eea96e0b8e8b347c.be.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/9413946b032a41d9bc8d198a968aea0b/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=NmIYKeqP1bO8nteexpEQwsb3hsk7qu0ngvn2oRv2xwM";
 
+    // Danh sách các ID textarea cần format danh sách gạch đầu dòng tự động khi dùng mic
+    const BULLET_FIELD_IDS = ['impact', 'reason', 'steps', 'nextSteps'];
+
     function toggleSpeech(targetId, buttonElement) {
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         
@@ -396,14 +399,17 @@
             
             let currentValue = targetField.value;
 
-            if (targetField.id === 'steps' || targetField.id === 'nextSteps') {
+            // KIỂM TRA XEM TRƯỜNG NÀY CÓ PHẢI LÀ DẠNG HIỂN THỊ DANH SÁCH NHIỀU DÒNG KHÔNG
+            if (BULLET_FIELD_IDS.includes(targetField.id)) {
+                // Nếu trường trống hoặc chỉ chứa ký tự khởi tạo thô mặc định của textarea
                 if (!currentValue || currentValue.trim() === "" || currentValue === "- \n- \n- " || currentValue === "- \n- ") {
                     targetField.value = "- " + textResult;
                 } else {
+                    // Nếu đã có chữ trước đó, tự động nhảy xuống dòng mới và thêm dấu gạch đầu dòng
                     targetField.value = targetField.value.trimEnd() + "\n- " + textResult;
                 }
             } else {
-                // Đối với ô input dùng placeholder, bấm mic là điền nối chuỗi thẳng thắn, sạch sẽ
+                // Áp dụng cho mục nhập text ngắn thường (Tên sự cố, thời gian)
                 if (currentValue === "") {
                     targetField.value = textResult; 
                 } else {
@@ -449,14 +455,14 @@
         return rawText.split('\n')
             .map(line => line.trim())
             .filter(line => line !== "")
-            .map(line => `\t${line}`)
+            // Đảm bảo mỗi dòng trong văn bản xuất ra đều được thụt lề chuẩn hóa
+            .map(line => line.startsWith('-') ? `\t${line}` : `\t- ${line}`)
             .join('\n');
     }
 
     function process(status) {
         const currentTime = getSystemTime();
         
-        // LOGIC THÔNG MINH MỚI: Nếu ô trống thì tự động bốc giá trị Guide mặc định để gán dữ liệu gửi đi
         let name = document.getElementById('incidentName').value.trim();
         if (!name) name = "Mô tả tên sự cố";
 
@@ -464,10 +470,10 @@
         let end = document.getElementById('endTime').value.trim();
 
         let impact = document.getElementById('impact').value.trim();
-        if (!impact) impact = "Mô tả phân vùng ảnh hưởng";
+        if (!impact) impact = "- Mô tả phân vùng ảnh hưởng";
 
         let reason = document.getElementById('reason').value.trim();
-        if (!reason) reason = "Đang kiểm tra...";
+        if (!reason) reason = "- Đang kiểm tra...";
 
         const steps = document.getElementById('steps').value.trim();
         const nextSteps = document.getElementById('nextSteps').value.trim();
@@ -491,8 +497,10 @@
         result += `Thời gian sự cố:\n`;
         result += `\t- Thời gian bắt đầu: ${start}\n`;
         result += `\t- Thời gian kết thúc: ${end}\n`;
-        result += `Mức độ ảnh hưởng: ${impact}\n`;
-        result += `Nguyên nhân: ${reason}\n`;
+        
+        // TRÍCH XUẤT FORMAT ĐỊNH DẠNG THEO DANH SÁCH NHIỀU DÒNG CHO MỤC MỨC ĐỘ VÀ NGUYÊN NHÂN
+        result += `Mức độ ảnh hưởng:\n${formatBulletLines(impact)}\n`;
+        result += `Nguyên nhân:\n${formatBulletLines(reason)}\n`;
         result += `Các bước xử lý:\n${formatBulletLines(steps)}\n`;
         result += `Bước xử lí tiếp theo:\n${formatBulletLines(nextSteps)}\n`;
         result += `Người điều hành/xử lý:\n${formatBulletLines(staff)}`;
