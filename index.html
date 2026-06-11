@@ -94,11 +94,48 @@
             position: relative;
         }
         .time-box input {
-            padding-right: 100px;
+            padding-right: 140px; /* Tăng khoảng trống để chứa cả 2 nút */
         }
+        
+        /* CSS MỚI: Khung bao bọc tích hợp nút Micro nằm ngang hàng */
+        .input-mic-group {
+            display: flex;
+            gap: 6px;
+            align-items: stretch;
+        }
+        
+        /* CSS MỚI: Định dạng cho nút Micro */
+        .btn-mic {
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            color: #64748b;
+            padding: 0 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s ease;
+        }
+        .btn-mic:hover {
+            background: #f1f5f9;
+            color: #334155;
+            border-color: #94a3b8;
+        }
+        .btn-mic.recording {
+            background: #fee2e2;
+            border-color: #fca5a5;
+            color: #ef4444;
+            animation: mic-blink 1.2s infinite;
+        }
+        @keyframes mic-blink {
+            50% { opacity: 0.6; }
+        }
+
         .btn-time {
             position: absolute;
-            right: 5px;
+            right: 42px; /* Dịch qua trái một chút để nhường chỗ cho nút Mic */
             top: 5px;
             bottom: 5px;
             background: #eff6ff;
@@ -113,6 +150,27 @@
         .btn-time:hover {
             background: #dbeafe;
         }
+        
+        /* Nút Mic đặc thù nằm bên trong ô nhập thời gian */
+        .btn-mic-inline {
+            position: absolute;
+            right: 5px;
+            top: 5px;
+            bottom: 5px;
+            width: 32px;
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            color: #64748b;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-mic-inline:hover { background: #f1f5f9; }
+        .btn-mic-inline.recording { background: #fee2e2; border-color: #fca5a5; color: #ef4444; animation: mic-blink 1.2s infinite; }
+
         .actions-bar {
             margin: 30px 0 20px 0;
             padding: 15px;
@@ -213,13 +271,16 @@
 
 <div class="wrapper">
     <header>
-        <h1>🚨 CÔNG CỤ TẠO BÁO CÁO SỰ CỐ & ĐỒNG BỘ SHAREPOINT_14h01</h1>
+        <h1>🚨 CÔNG CỤ TẠO BÁO CÁO SỰ CỐ & ĐỒNG BỘ SHAREPOINT_15h15</h1>
         <p>Hệ thống tự động chuẩn hóa định dạng văn bản quy trình vận hành</p>
     </header>
 
     <div class="form-row">
         <label for="incidentName">1. Tên sự cố:</label>
-        <textarea id="incidentName" rows="2">Mô tả tên sự cố</textarea>
+        <div class="input-mic-group">
+            <textarea id="incidentName" rows="2">Mô tả tên sự cố</textarea>
+            <button type="button" class="btn-mic" onclick="toggleSpeech('incidentName', this)">🎙️</button>
+        </div>
     </div>
 
     <div class="grid-2">
@@ -228,6 +289,7 @@
             <div class="time-box">
                 <input type="text" id="startTime" placeholder="Để trống tự lấy giờ hiện tại">
                 <button class="btn-time" onclick="setNow('startTime')">Giờ hiện tại</button>
+                <button type="button" class="btn-mic-inline" onclick="toggleSpeech('startTime', this)">🎙️</button>
             </div>
         </div>
         <div class="grid-col form-row">
@@ -235,6 +297,7 @@
             <div class="time-box">
                 <input type="text" id="endTime" placeholder="Điền khi kết thúc sự cố">
                 <button class="btn-time" onclick="setNow('endTime')">Giờ hiện tại</button>
+                <button type="button" class="btn-mic-inline" onclick="toggleSpeech('endTime', this)">🎙️</button>
             </div>
         </div>
     </div>
@@ -242,22 +305,34 @@
     <div class="grid-2">
         <div class="grid-col form-row">
             <label for="impact">4. Mức độ ảnh hưởng / Phân vùng lỗi:</label>
-            <input type="text" id="impact" value="Mô tả phân vùng ảnh hưởng">
+            <div class="input-mic-group">
+                <input type="text" id="impact" value="Mô tả phân vùng ảnh hưởng">
+                <button type="button" class="btn-mic" onclick="toggleSpeech('impact', this)">🎙️</button>
+            </div>
         </div>
         <div class="grid-col form-row">
             <label for="reason">5. Nguyên nhân:</label>
-            <input type="text" id="reason" value="Đang kiểm tra...">
+            <div class="input-mic-group">
+                <input type="text" id="reason" value="Đang kiểm tra...">
+                <button type="button" class="btn-mic" onclick="toggleSpeech('reason', this)">🎙️</button>
+            </div>
         </div>
     </div>
 
     <div class="form-row">
         <label for="steps">6. Các bước đã xử lý (Mỗi hành động một dòng):</label>
-        <textarea id="steps" rows="3">- &#10;- &#10;- </textarea>
+        <div class="input-mic-group">
+            <textarea id="steps" rows="3">- &#10;- &#10;- </textarea>
+            <button type="button" class="btn-mic" onclick="toggleSpeech('steps', this)">🎙️</button>
+        </div>
     </div>
 
     <div class="form-row">
         <label for="nextSteps">7. Bước xử lý tiếp theo:</label>
-        <textarea id="nextSteps" rows="2">- &#10;- </textarea>
+        <div class="input-mic-group">
+            <textarea id="nextSteps" rows="2">- &#10;- </textarea>
+            <button type="button" class="btn-mic" onclick="toggleSpeech('nextSteps', this)">🎙️</button>
+        </div>
     </div>
 
     <div class="form-row">
@@ -287,9 +362,93 @@
 </div>
 
 <script>
-    // ĐIỀN ĐƯỜNG DẪN WEBHOOK POWER AUTOMATE CỦA BẠN VÀO ĐÂY
     const POWER_AUTOMATE_URL = "https://default89a7f078234b46eea96e0b8e8b347c.be.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/9413946b032a41d9bc8d198a968aea0b/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=NmIYKeqP1bO8nteexpEQwsb3hsk7qu0ngvn2oRv2xwM";
 
+    // ==========================================
+    // JS MỚI: HÀM XỬ LÝ AI NHẬN DIỆN GIỌNG NÓI VOICE-TO-TEXT
+    // ==========================================
+    function toggleSpeech(targetId, buttonElement) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        
+        if (!SpeechRecognition) {
+            alert("Trình duyệt không hỗ trợ nhận diện giọng nói. Anh em vui lòng dùng Chrome hoặc Edge nhé!");
+            return;
+        }
+
+        // Nếu bấm lần nữa khi đang ghi âm thì ra lệnh dừng chủ động
+        if (buttonElement.classList.contains('recording')) {
+            window.currentRecognition.stop();
+            return;
+        }
+
+        const recognition = new SpeechRecognition();
+        window.currentRecognition = recognition; 
+        
+        recognition.lang = 'vi-VN'; // Ép cấu hình bắt ngôn ngữ Tiếng Việt 100%
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
+
+        const targetField = document.getElementById(targetId);
+
+        recognition.onstart = function() {
+            buttonElement.classList.add('recording');
+            if(buttonElement.tagName.toLowerCase() === 'button' && !buttonElement.classList.contains('btn-mic-inline')) {
+                buttonElement.innerHTML = "🛑";
+            }
+        };
+
+        recognition.onresult = function(event) {
+            let textResult = event.results[0][0].transcript;
+            
+            // Tự động chuẩn hóa viết hoa ký tự đầu tiên
+            textResult = textResult.charAt(0).toUpperCase() + textResult.slice(1);
+            
+            // Trích xuất text thô hiện tại bỏ khoảng trống thừa để kiểm tra cấu trúc
+            let currentValue = targetField.value.trim();
+
+            if (targetField.id === 'steps' || targetField.id === 'nextSteps') {
+                // XỬ LÝ RIÊNG BIỆT CHO MỤC 6 VÀ 7 (CÓ SẴN DẤU GẠCH ĐẦU DÒNG THÔ "- ")
+                if (!targetField.value || targetField.value.trim() === "" || targetField.value === "- \n- \n- " || targetField.value === "- \n- ") {
+                    targetField.value = "- " + textResult;
+                } else {
+                    // Nếu đã có dữ liệu từ trước, tự động xuống dòng và thêm dòng mới có dấu gạch đầu dòng
+                    targetField.value = targetField.value.trimEnd() + "\n- " + textResult;
+                }
+            } else {
+                // XỬ LÝ CHO CÁC Ô INPUT KHÁC (1, 2, 3, 4, 5)
+                if (currentValue === "" || currentValue === "Mô tả tên sự cố" || currentValue === "Mô tả phân vùng ảnh hưởng" || currentValue === "Đang kiểm tra...") {
+                    targetField.value = textResult; // Ghi đè chữ mới lên giá trị placeholder thô ban đầu
+                } else {
+                    targetField.value = targetField.value.trimEnd() + " " + textResult; // Nối chuỗi tiếp nối
+                }
+            }
+        };
+
+        recognition.onspeechend = function() {
+            recognition.stop();
+        };
+
+        recognition.onend = function() {
+            buttonElement.classList.remove('recording');
+            if(!buttonElement.classList.contains('btn-mic-inline')) {
+                buttonElement.innerHTML = "🎙️";
+            }
+        };
+
+        recognition.onerror = function(event) {
+            console.error("Speech Error: ", event.error);
+            buttonElement.classList.remove('recording');
+            if(!buttonElement.classList.contains('btn-mic-inline')) {
+                buttonElement.innerHTML = "🎙️";
+            }
+        };
+
+        recognition.start();
+    }
+
+    // ==========================================
+    // LOGIC CŨ ĐANG CHẠY TỐT - GIỮ NGUYÊN TUYỆT ĐỐI
+    // ==========================================
     function getSystemTime() {
         const d = new Date();
         const pad = (v) => v < 10 ? '0' + v : v;
@@ -351,7 +510,6 @@
         outArea.style.display = 'block';
         outArea.scrollIntoView({ behavior: 'smooth' });
 
-        // TỰ ĐỘNG KÍCH HOẠT ĐẨY DỮ LIỆU SANG SHAREPOINT (KẾ THỪA)
         sendToSharePoint(status, name, start, end, impact, reason, steps, nextSteps, staff);
     }
 
@@ -366,7 +524,6 @@
         spStatus.style.color = '#f59e0b';
         spStatus.innerText = "⏳ Đang đồng bộ dữ liệu lên SharePoint...";
 
-        // Đóng gói payload JSON sạch sẽ có tính kế thừa cao
         const payload = {
             "Status": status,
             "Event_Title": name,
