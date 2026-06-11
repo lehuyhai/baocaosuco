@@ -94,17 +94,15 @@
             position: relative;
         }
         .time-box input {
-            padding-right: 140px; /* Tăng khoảng trống để chứa cả 2 nút */
+            padding-right: 140px;
         }
         
-        /* CSS MỚI: Khung bao bọc tích hợp nút Micro nằm ngang hàng */
         .input-mic-group {
             display: flex;
             gap: 6px;
             align-items: stretch;
         }
         
-        /* CSS MỚI: Định dạng cho nút Micro */
         .btn-mic {
             background: #f8fafc;
             border: 1px solid var(--border-color);
@@ -135,7 +133,7 @@
 
         .btn-time {
             position: absolute;
-            right: 42px; /* Dịch qua trái một chút để nhường chỗ cho nút Mic */
+            right: 42px;
             top: 5px;
             bottom: 5px;
             background: #eff6ff;
@@ -151,7 +149,6 @@
             background: #dbeafe;
         }
         
-        /* Nút Mic đặc thù nằm bên trong ô nhập thời gian */
         .btn-mic-inline {
             position: absolute;
             right: 5px;
@@ -271,14 +268,14 @@
 
 <div class="wrapper">
     <header>
-        <h1>🚨 CÔNG CỤ TẠO BÁO CÁO SỰ CỐ & ĐỒNG BỘ SHAREPOINT_15h15</h1>
+        <h1>🚨 CÔNG CỤ TẠO BÁO CÁO SỰ CỐ & ĐỒNG BỘ SHAREPOINT_15h37</h1>
         <p>Hệ thống tự động chuẩn hóa định dạng văn bản quy trình vận hành</p>
     </header>
 
     <div class="form-row">
         <label for="incidentName">1. Tên sự cố:</label>
         <div class="input-mic-group">
-            <textarea id="incidentName" rows="2">Mô tả tên sự cố</textarea>
+            <textarea id="incidentName" rows="2" placeholder="Mô tả tên sự cố"></textarea>
             <button type="button" class="btn-mic" onclick="toggleSpeech('incidentName', this)">🎙️</button>
         </div>
     </div>
@@ -306,14 +303,14 @@
         <div class="grid-col form-row">
             <label for="impact">4. Mức độ ảnh hưởng / Phân vùng lỗi:</label>
             <div class="input-mic-group">
-                <input type="text" id="impact" value="Mô tả phân vùng ảnh hưởng">
+                <input type="text" id="impact" placeholder="Mô tả phân vùng ảnh hưởng">
                 <button type="button" class="btn-mic" onclick="toggleSpeech('impact', this)">🎙️</button>
             </div>
         </div>
         <div class="grid-col form-row">
             <label for="reason">5. Nguyên nhân:</label>
             <div class="input-mic-group">
-                <input type="text" id="reason" value="Đang kiểm tra...">
+                <input type="text" id="reason" placeholder="Đang kiểm tra...">
                 <button type="button" class="btn-mic" onclick="toggleSpeech('reason', this)">🎙️</button>
             </div>
         </div>
@@ -364,9 +361,6 @@
 <script>
     const POWER_AUTOMATE_URL = "https://default89a7f078234b46eea96e0b8e8b347c.be.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/9413946b032a41d9bc8d198a968aea0b/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=NmIYKeqP1bO8nteexpEQwsb3hsk7qu0ngvn2oRv2xwM";
 
-    // ==========================================
-    // JS MỚI: HÀM XỬ LÝ AI NHẬN DIỆN GIỌNG NÓI VOICE-TO-TEXT
-    // ==========================================
     function toggleSpeech(targetId, buttonElement) {
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         
@@ -375,7 +369,6 @@
             return;
         }
 
-        // Nếu bấm lần nữa khi đang ghi âm thì ra lệnh dừng chủ động
         if (buttonElement.classList.contains('recording')) {
             window.currentRecognition.stop();
             return;
@@ -384,7 +377,7 @@
         const recognition = new SpeechRecognition();
         window.currentRecognition = recognition; 
         
-        recognition.lang = 'vi-VN'; // Ép cấu hình bắt ngôn ngữ Tiếng Việt 100%
+        recognition.lang = 'vi-VN'; 
         recognition.interimResults = false;
         recognition.maxAlternatives = 1;
 
@@ -399,27 +392,22 @@
 
         recognition.onresult = function(event) {
             let textResult = event.results[0][0].transcript;
-            
-            // Tự động chuẩn hóa viết hoa ký tự đầu tiên
             textResult = textResult.charAt(0).toUpperCase() + textResult.slice(1);
             
-            // Trích xuất text thô hiện tại bỏ khoảng trống thừa để kiểm tra cấu trúc
-            let currentValue = targetField.value.trim();
+            let currentValue = targetField.value;
 
             if (targetField.id === 'steps' || targetField.id === 'nextSteps') {
-                // XỬ LÝ RIÊNG BIỆT CHO MỤC 6 VÀ 7 (CÓ SẴN DẤU GẠCH ĐẦU DÒNG THÔ "- ")
-                if (!targetField.value || targetField.value.trim() === "" || targetField.value === "- \n- \n- " || targetField.value === "- \n- ") {
+                if (!currentValue || currentValue.trim() === "" || currentValue === "- \n- \n- " || currentValue === "- \n- ") {
                     targetField.value = "- " + textResult;
                 } else {
-                    // Nếu đã có dữ liệu từ trước, tự động xuống dòng và thêm dòng mới có dấu gạch đầu dòng
                     targetField.value = targetField.value.trimEnd() + "\n- " + textResult;
                 }
             } else {
-                // XỬ LÝ CHO CÁC Ô INPUT KHÁC (1, 2, 3, 4, 5)
-                if (currentValue === "" || currentValue === "Mô tả tên sự cố" || currentValue === "Mô tả phân vùng ảnh hưởng" || currentValue === "Đang kiểm tra...") {
-                    targetField.value = textResult; // Ghi đè chữ mới lên giá trị placeholder thô ban đầu
+                // Đối với ô input dùng placeholder, bấm mic là điền nối chuỗi thẳng thắn, sạch sẽ
+                if (currentValue === "") {
+                    targetField.value = textResult; 
                 } else {
-                    targetField.value = targetField.value.trimEnd() + " " + textResult; // Nối chuỗi tiếp nối
+                    targetField.value = targetField.value.trimEnd() + " " + textResult;
                 }
             }
         };
@@ -446,9 +434,6 @@
         recognition.start();
     }
 
-    // ==========================================
-    // LOGIC CŨ ĐANG CHẠY TỐT - GIỮ NGUYÊN TUYỆT ĐỐI
-    // ==========================================
     function getSystemTime() {
         const d = new Date();
         const pad = (v) => v < 10 ? '0' + v : v;
@@ -470,11 +455,20 @@
 
     function process(status) {
         const currentTime = getSystemTime();
-        const name = document.getElementById('incidentName').value.trim();
+        
+        // LOGIC THÔNG MINH MỚI: Nếu ô trống thì tự động bốc giá trị Guide mặc định để gán dữ liệu gửi đi
+        let name = document.getElementById('incidentName').value.trim();
+        if (!name) name = "Mô tả tên sự cố";
+
         let start = document.getElementById('startTime').value.trim();
         let end = document.getElementById('endTime').value.trim();
-        const impact = document.getElementById('impact').value.trim();
-        const reason = document.getElementById('reason').value.trim();
+
+        let impact = document.getElementById('impact').value.trim();
+        if (!impact) impact = "Mô tả phân vùng ảnh hưởng";
+
+        let reason = document.getElementById('reason').value.trim();
+        if (!reason) reason = "Đang kiểm tra...";
+
         const steps = document.getElementById('steps').value.trim();
         const nextSteps = document.getElementById('nextSteps').value.trim();
         const staff = document.getElementById('staff').value.trim();
