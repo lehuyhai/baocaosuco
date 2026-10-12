@@ -488,15 +488,15 @@
             document.getElementById('endTime').value = currentTime;
         }
 
-        let titleHeader = "[SỰ CỐ]";
+        let titleHeader = "[SỰ CỐ][BẮT ĐẦU]";
         if (status === 'UPDATE') titleHeader = "[SỰ CỐ][CẬP NHẬT]";
         if (status === 'END') titleHeader = "[SỰ CỐ][KẾT THÚC]";
 
         let result = `${titleHeader}\n`;
         result += `Tên sự cố: ${name}\n`;
         result += `Thời gian sự cố:\n`;
-        result += `\t- Thời gian bắt đầu: ${start}\n`;
-        result += `\t- Thời gian kết thúc: ${end}\n`;
+        result += `\t- Bắt đầu: ${start}\n`;
+        result += `\t- Kết thúc: ${end}\n`;
         
         // TRÍCH XUẤT FORMAT ĐỊNH DẠNG THEO DANH SÁCH NHIỀU DÒNG CHO MỤC MỨC ĐỘ VÀ NGUYÊN NHÂN
         result += `Mức độ ảnh hưởng:\n${formatBulletLines(impact)}\n`;
