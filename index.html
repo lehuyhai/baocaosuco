@@ -168,6 +168,23 @@
         .btn-mic-inline:hover { background: #f1f5f9; }
         .btn-mic-inline.recording { background: #fee2e2; border-color: #fca5a5; color: #ef4444; animation: mic-blink 1.2s infinite; }
 
+        .checkbox-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #0369a1;
+            background: #e0f2fe;
+            padding: 4px 10px;
+            border-radius: 4px;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+        .checkbox-label input {
+            cursor: pointer;
+        }
+
         .actions-bar {
             margin: 30px 0 20px 0;
             padding: 15px;
@@ -268,10 +285,11 @@
 
 <div class="wrapper">
     <header>
-        <h1>🚨 CÔNG CỤ TẠO BÁO CÁO SỰ CỐ & ĐỒNG BỘ SHAREPOINT_16h07</h1>
+        <h1>🚨 CÔNG CỤ TẠO BÁO CÁO SỰ CỐ & ĐỒNG BỘ SHAREPOINT_14h01</h1>
         <p>Hệ thống tự động chuẩn hóa định dạng văn bản quy trình vận hành</p>
     </header>
 
+    <!-- 1. Tên sự cố -->
     <div class="form-row">
         <label for="incidentName">1. Tên sự cố:</label>
         <div class="input-mic-group">
@@ -281,6 +299,7 @@
     </div>
 
     <div class="grid-2">
+        <!-- 2. Thời gian bắt đầu -->
         <div class="grid-col form-row">
             <label for="startTime">2. Thời gian bắt đầu:</label>
             <div class="time-box">
@@ -289,6 +308,7 @@
                 <button type="button" class="btn-mic-inline" onclick="toggleSpeech('startTime', this)">🎙️</button>
             </div>
         </div>
+        <!-- 3. Thời gian kết thúc -->
         <div class="grid-col form-row">
             <label for="endTime">3. Thời gian kết thúc:</label>
             <div class="time-box">
@@ -299,23 +319,37 @@
         </div>
     </div>
 
-    <div class="grid-2">
-        <div class="grid-col form-row">
-            <label for="impact">4. Mức độ ảnh hưởng / Phân vùng lỗi:</label>
-            <div class="input-mic-group">
-                <textarea id="impact" rows="3" placeholder="Mô tả phân vùng ảnh hưởng"></textarea>
-                <button type="button" class="btn-mic" onclick="toggleSpeech('impact', this)">🎙️</button>
+    <!-- 4. Mức độ ảnh hưởng -->
+    <div class="form-row">
+        <label>4. Mức độ ảnh hưởng:</label>
+        <div class="grid-2">
+            <div class="grid-col">
+                <label style="font-size: 12.5px; color: #64748b;">+ Về mặt mạng lưới:</label>
+                <div class="input-mic-group">
+                    <textarea id="impactNetwork" rows="2" placeholder="Mô tả ảnh hưởng mạng lưới..."></textarea>
+                    <button type="button" class="btn-mic" onclick="toggleSpeech('impactNetwork', this)">🎙️</button>
+                </div>
             </div>
-        </div>
-        <div class="grid-col form-row">
-            <label for="reason">5. Nguyên nhân:</label>
-            <div class="input-mic-group">
-                <textarea id="reason" rows="3" placeholder="Đang kiểm tra..."></textarea>
-                <button type="button" class="btn-mic" onclick="toggleSpeech('reason', this)">🎙️</button>
+            <div class="grid-col">
+                <label style="font-size: 12.5px; color: #64748b;">+ Về mặt dịch vụ:</label>
+                <div class="input-mic-group">
+                    <textarea id="impactService" rows="2" placeholder="Mô tả ảnh hưởng dịch vụ..."></textarea>
+                    <button type="button" class="btn-mic" onclick="toggleSpeech('impactService', this)">🎙️</button>
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- 5. Nguyên nhân -->
+    <div class="form-row">
+        <label for="reason">5. Nguyên nhân:</label>
+        <div class="input-mic-group">
+            <textarea id="reason" rows="2" placeholder="Đang kiểm tra..."></textarea>
+            <button type="button" class="btn-mic" onclick="toggleSpeech('reason', this)">🎙️</button>
+        </div>
+    </div>
+
+    <!-- 6. Các bước đã xử lý -->
     <div class="form-row">
         <label for="steps">6. Các bước đã xử lý (Mỗi hành động một dòng):</label>
         <div class="input-mic-group">
@@ -324,17 +358,24 @@
         </div>
     </div>
 
+    <!-- 7. Bước xử lý tiếp theo -->
     <div class="form-row">
-        <label for="nextSteps">7. Bước xử lý tiếp theo:</label>
+        <div style="display: flex; align-items: center; margin-bottom: 6px;">
+            <label for="nextSteps" style="margin-bottom: 0;">7. Bước xử lý tiếp theo:</label>
+            <label class="checkbox-label">
+                <input type="checkbox" id="includeNextSteps"> Đưa vào báo cáo
+            </label>
+        </div>
         <div class="input-mic-group">
             <textarea id="nextSteps" rows="2">- &#10;- </textarea>
             <button type="button" class="btn-mic" onclick="toggleSpeech('nextSteps', this)">🎙️</button>
         </div>
     </div>
 
+    <!-- 8. Người điều hành -->
     <div class="form-row">
-        <label for="staff">8. Người điều hành / Xử lý (Mỗi chức danh một dòng):</label>
-        <textarea id="staff" rows="4">- Quản lý sự cố (IM): Nguyễn Thái Bình&#10;- Nhân sự FO: Lê Kim Bính&#10;- Nhân sự phòng NVKH: &#10;- Nhân sự đài VHKT MB: </textarea>
+        <label for="staff">8. Nhân sự điều hành, xử lí, gồm:</label>
+        <textarea id="staff" rows="4">- Điều hành (IM): Nguyễn Thái Bình&#10;- Tech hiện trường BO: &#10;- Tech Support: &#10;- Trực ca FO: </textarea>
     </div>
 
     <div class="actions-bar">
@@ -361,8 +402,7 @@
 <script>
     const POWER_AUTOMATE_URL = "https://default89a7f078234b46eea96e0b8e8b347c.be.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/9413946b032a41d9bc8d198a968aea0b/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=NmIYKeqP1bO8nteexpEQwsb3hsk7qu0ngvn2oRv2xwM";
 
-    // Danh sách các ID textarea cần format danh sách gạch đầu dòng tự động khi dùng mic
-    const BULLET_FIELD_IDS = ['impact', 'reason', 'steps', 'nextSteps'];
+    const BULLET_FIELD_IDS = ['impactNetwork', 'impactService', 'reason', 'steps', 'nextSteps'];
 
     function toggleSpeech(targetId, buttonElement) {
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -399,17 +439,13 @@
             
             let currentValue = targetField.value;
 
-            // KIỂM TRA XEM TRƯỜNG NÀY CÓ PHẢI LÀ DẠNG HIỂN THỊ DANH SÁCH NHIỀU DÒNG KHÔNG
             if (BULLET_FIELD_IDS.includes(targetField.id)) {
-                // Nếu trường trống hoặc chỉ chứa ký tự khởi tạo thô mặc định của textarea
                 if (!currentValue || currentValue.trim() === "" || currentValue === "- \n- \n- " || currentValue === "- \n- ") {
                     targetField.value = "- " + textResult;
                 } else {
-                    // Nếu đã có chữ trước đó, tự động nhảy xuống dòng mới và thêm dấu gạch đầu dòng
                     targetField.value = targetField.value.trimEnd() + "\n- " + textResult;
                 }
             } else {
-                // Áp dụng cho mục nhập text ngắn thường (Tên sự cố, thời gian)
                 if (currentValue === "") {
                     targetField.value = textResult; 
                 } else {
@@ -455,7 +491,6 @@
         return rawText.split('\n')
             .map(line => line.trim())
             .filter(line => line !== "")
-            // Đảm bảo mỗi dòng trong văn bản xuất ra đều được thụt lề chuẩn hóa
             .map(line => line.startsWith('-') ? `\t${line}` : `\t- ${line}`)
             .join('\n');
     }
@@ -469,14 +504,27 @@
         let start = document.getElementById('startTime').value.trim();
         let end = document.getElementById('endTime').value.trim();
 
-        let impact = document.getElementById('impact').value.trim();
-        if (!impact) impact = "- Mô tả phân vùng ảnh hưởng";
+        let netVal = document.getElementById('impactNetwork').value.trim();
+        let serVal = document.getElementById('impactService').value.trim();
+        
+        let impactScopeStr = "";
+        if (netVal) impactScopeStr += `\t- Về mặt mạng lưới: ${netVal}\n`;
+        if (serVal) impactScopeStr += `\t- Về mặt dịch vụ: ${serVal}`;
+        if (!impactScopeStr) impactScopeStr = "\t- Về mặt mạng lưới: Mô tả ảnh hưởng mạng lưới...\n\t- Về mặt dịch vụ: Mô tả ảnh hưởng dịch vụ...";
 
         let reason = document.getElementById('reason').value.trim();
         if (!reason) reason = "- Đang kiểm tra...";
 
         const steps = document.getElementById('steps').value.trim();
-        const nextSteps = document.getElementById('nextSteps').value.trim();
+        
+        const isNextStepsChecked = document.getElementById('includeNextSteps').checked;
+        const rawNextSteps = document.getElementById('nextSteps').value.trim();
+        let nextStepsFormatted = "";
+
+        if (isNextStepsChecked && rawNextSteps) {
+            nextStepsFormatted = `Bước xử lí tiếp theo:\n${formatBulletLines(rawNextSteps)}\n`;
+        }
+
         const staff = document.getElementById('staff').value.trim();
 
         if (status === 'START' && !start) {
@@ -488,22 +536,26 @@
             document.getElementById('endTime').value = currentTime;
         }
 
+        // ĐÃ CẬP NHẬT TRẠNG THÁI BẮT ĐẦU THÀNH [SỰ CỐ][BẮT ĐẦU]
         let titleHeader = "[SỰ CỐ][BẮT ĐẦU]";
         if (status === 'UPDATE') titleHeader = "[SỰ CỐ][CẬP NHẬT]";
         if (status === 'END') titleHeader = "[SỰ CỐ][KẾT THÚC]";
 
-        let result = `${titleHeader}\n`;
+        // BỔ SUNG CỐ ĐỊNH CHỮ "Đài VHKT MN BÁO CÁO:" ĐẦU BÁO CÁO
+        let result = `Đài VHKT MN BÁO CÁO:\n${titleHeader}\n`;
         result += `Tên sự cố: ${name}\n`;
         result += `Thời gian sự cố:\n`;
-        result += `\t- Bắt đầu: ${start}\n`;
-        result += `\t- Kết thúc: ${end}\n`;
-        
-        // TRÍCH XUẤT FORMAT ĐỊNH DẠNG THEO DANH SÁCH NHIỀU DÒNG CHO MỤC MỨC ĐỘ VÀ NGUYÊN NHÂN
-        result += `Mức độ ảnh hưởng:\n${formatBulletLines(impact)}\n`;
+        result += `\t- Thời gian bắt đầu: ${start}\n`;
+        result += `\t- Thời gian kết thúc: ${end}\n`;
+        result += `Mức độ ảnh hưởng:\n${impactScopeStr}\n`;
         result += `Nguyên nhân:\n${formatBulletLines(reason)}\n`;
         result += `Các bước xử lý:\n${formatBulletLines(steps)}\n`;
-        result += `Bước xử lí tiếp theo:\n${formatBulletLines(nextSteps)}\n`;
-        result += `Người điều hành/xử lý:\n${formatBulletLines(staff)}`;
+        
+        if (nextStepsFormatted) {
+            result += nextStepsFormatted;
+        }
+
+        result += `Nhân sự điều hành, xử lí, gồm:\n${formatBulletLines(staff)}`;
 
         document.getElementById('finalResult').value = result;
         document.getElementById('copyBtn').innerText = "📋 Sao Chép Nhanh";
@@ -512,7 +564,7 @@
         outArea.style.display = 'block';
         outArea.scrollIntoView({ behavior: 'smooth' });
 
-        sendToSharePoint(status, name, start, end, impact, reason, steps, nextSteps, staff);
+        sendToSharePoint(status, name, start, end, impactScopeStr, reason, steps, (isNextStepsChecked ? rawNextSteps : ""), staff);
     }
 
     function sendToSharePoint(status, name, start, end, impact, reason, steps, nextSteps, staff) {
