@@ -372,7 +372,7 @@
         </div>
     </div>
 
-    <!-- 8. Người điều hành -->
+    <!-- 8. Nhân sự điều hành -->
     <div class="form-row">
         <label for="staff">8. Nhân sự điều hành, xử lí, gồm:</label>
         <textarea id="staff" rows="4">- Điều hành (IM): Nguyễn Thái Bình&#10;- Tech hiện trường BO: &#10;- Tech Support: &#10;- Trực ca FO: </textarea>
@@ -402,7 +402,7 @@
 <script>
     const POWER_AUTOMATE_URL = "https://default89a7f078234b46eea96e0b8e8b347c.be.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/9413946b032a41d9bc8d198a968aea0b/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=NmIYKeqP1bO8nteexpEQwsb3hsk7qu0ngvn2oRv2xwM";
 
-    const BULLET_FIELD_IDS = ['impactNetwork', 'impactService', 'reason', 'steps', 'nextSteps'];
+    const BULLET_FIELD_IDS = ['impactNetwork', 'impactService', 'steps', 'nextSteps'];
 
     function toggleSpeech(targetId, buttonElement) {
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -486,12 +486,13 @@
         document.getElementById(elementId).value = getSystemTime();
     }
 
+    // Hàm định dạng bỏ thụt lề sâu, giữ nguyên dạng danh sách gọn gàng sát lề
     function formatBulletLines(rawText) {
         if (!rawText || !rawText.trim()) return "";
         return rawText.split('\n')
             .map(line => line.trim())
             .filter(line => line !== "")
-            .map(line => line.startsWith('-') ? `\t${line}` : `\t- ${line}`)
+            .map(line => line.startsWith('-') ? `${line}` : `- ${line}`)
             .join('\n');
     }
 
@@ -507,13 +508,11 @@
         let netVal = document.getElementById('impactNetwork').value.trim();
         let serVal = document.getElementById('impactService').value.trim();
         
-        let impactScopeStr = "";
-        if (netVal) impactScopeStr += `\t- Về mặt mạng lưới: ${netVal}\n`;
-        if (serVal) impactScopeStr += `\t- Về mặt dịch vụ: ${serVal}`;
-        if (!impactScopeStr) impactScopeStr = "\t- Về mặt mạng lưới: Mô tả ảnh hưởng mạng lưới...\n\t- Về mặt dịch vụ: Mô tả ảnh hưởng dịch vụ...";
+        if (!netVal) netVal = "Chưa xác định";
+        if (!serVal) serVal = "Chưa xác định";
 
         let reason = document.getElementById('reason').value.trim();
-        if (!reason) reason = "- Đang kiểm tra...";
+        if (!reason) reason = "Đang kiểm tra...";
 
         const steps = document.getElementById('steps').value.trim();
         
@@ -536,26 +535,27 @@
             document.getElementById('endTime').value = currentTime;
         }
 
-        // ĐÃ CẬP NHẬT TRẠNG THÁI BẮT ĐẦU THÀNH [SỰ CỐ][BẮT ĐẦU]
         let titleHeader = "[SỰ CỐ][BẮT ĐẦU]";
         if (status === 'UPDATE') titleHeader = "[SỰ CỐ][CẬP NHẬT]";
         if (status === 'END') titleHeader = "[SỰ CỐ][KẾT THÚC]";
 
-        // BỔ SUNG CỐ ĐỊNH CHỮ "Đài VHKT MN BÁO CÁO:" ĐẦU BÁO CÁO
+        // XUẤT VĂN BẢN ĐÃ CÂN CHỈNH KHÔNG LÙI DÒNG QUÁ SÂU, ĐÚNG MẪU YÊU CẦU
         let result = `Đài VHKT MN BÁO CÁO:\n${titleHeader}\n`;
         result += `Tên sự cố: ${name}\n`;
         result += `Thời gian sự cố:\n`;
-        result += `\t- Thời gian bắt đầu: ${start}\n`;
-        result += `\t- Thời gian kết thúc: ${end}\n`;
-        result += `Mức độ ảnh hưởng:\n${impactScopeStr}\n`;
-        result += `Nguyên nhân:\n${formatBulletLines(reason)}\n`;
+        result += `+ Bắt đầu: ${start || 'Chưa'}\n`;
+        result += `+ Kết thúc: ${end || 'Chưa'}\n`;
+        result += `Mức độ ảnh hưởng:\n`;
+        result += `- Về mặt mạng lưới: ${netVal}\n`;
+        result += `- Về mặt dịch vụ: ${serVal}\n`;
+        result += `Nguyên nhân: ${reason}\n`;
         result += `Các bước xử lý:\n${formatBulletLines(steps)}\n`;
         
         if (nextStepsFormatted) {
             result += nextStepsFormatted;
         }
 
-        result += `Nhân sự điều hành, xử lí, gồm:\n${formatBulletLines(staff)}`;
+        result += `Nhân sự điều hành, xử lí:\n${formatBulletLines(staff)}`;
 
         document.getElementById('finalResult').value = result;
         document.getElementById('copyBtn').innerText = "📋 Sao Chép Nhanh";
@@ -564,7 +564,7 @@
         outArea.style.display = 'block';
         outArea.scrollIntoView({ behavior: 'smooth' });
 
-        sendToSharePoint(status, name, start, end, impactScopeStr, reason, steps, (isNextStepsChecked ? rawNextSteps : ""), staff);
+        sendToSharePoint(status, name, start, end, `- Về mặt mạng lưới: ${netVal}\n- Về mặt dịch vụ: ${serVal}`, reason, steps, (isNextStepsChecked ? rawNextSteps : ""), staff);
     }
 
     function sendToSharePoint(status, name, start, end, impact, reason, steps, nextSteps, staff) {
